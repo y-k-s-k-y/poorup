@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PoorUp - Free Online Board Game</title>
+<title>PoorUp</title>
 <style>
 /* =====================================================================
    PoorUp - consolidated stylesheet
@@ -11,26 +11,36 @@
    country colour band, a true-proportion flag and a horizontal name.
    ===================================================================== */
 :root{
-  --bg:#06141f; --panel:#0e2a3f; --panel2:#16405c; --panel3:#0a2032;
-  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.17);
-  --ink:#f3f7f7; --muted:#93b0bf;
+  --bg:#071620; --panel:#0e2a3f; --panel2:#16405c; --panel3:#0a2032;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+  --ink:#f3f7f7; --muted:#8ba8b8;
   --gold:#f2b93b; --brass:#f2b93b; --danger:#ff7078; --ok:#54d66a;
-  --tile-a:#16354e; --tile-b:#0f2a3d;
+  --tile-a:#173a55; --tile-b:#0e2c41;
   --b:min(calc(100vw - 480px),calc(100vh - 84px),780px);
   --coin:clamp(16px,calc(var(--b)/31),28px);
-  --shadow:0 18px 50px rgba(0,0,0,.38);
+  --shadow:0 20px 54px rgba(0,0,0,.42);
   --serif:Georgia,"Times New Roman",serif;
+  --r-sm:8px; --r-md:12px; --r-lg:18px;
+  --ease:cubic-bezier(.22,.8,.3,1);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
+html{scrollbar-color:#2a5578 #0a1f2f}
 body{
   min-height:100vh;color:var(--ink);
   font-family:"Avenir Next","Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   background:
-    radial-gradient(900px 500px at 12% -5%,rgba(41,112,145,.30),transparent 60%),
-    radial-gradient(900px 520px at 98% 108%,rgba(24,66,98,.38),transparent 60%),
+    radial-gradient(1000px 560px at 12% -8%,rgba(41,112,145,.30),transparent 60%),
+    radial-gradient(1000px 560px at 100% 105%,rgba(24,66,98,.36),transparent 62%),
+    radial-gradient(700px 420px at 50% 40%,rgba(9,26,38,0),rgba(3,11,17,.4) 120%),
     var(--bg);
 }
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#2a5578;border-radius:99px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:#356789}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(5px)}100%{opacity:1;transform:translateY(0)}}
 button{font:inherit}
 h1,h2,h3,h4{font-family:var(--serif);margin:0}
 .muted{color:var(--muted)}
@@ -38,52 +48,57 @@ h1,h2,h3,h4{font-family:var(--serif);margin:0}
 /* ---------- header ---------- */
 header{
   position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:10px 18px;background:rgba(6,20,31,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  padding:11px 20px;background:rgba(5,16,25,.86);backdrop-filter:blur(14px) saturate(1.15);
+  border-bottom:1px solid var(--line);box-shadow:0 6px 20px rgba(0,0,0,.18);
 }
-.logo{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:700;font-size:24px;letter-spacing:.03em;color:var(--gold);cursor:pointer;user-select:none}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:23px;letter-spacing:.02em;color:var(--gold);cursor:pointer;user-select:none}
 .logo::before{
-  content:"P";display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
-  font-size:14px;color:#3a2600;
-  background:radial-gradient(circle at 32% 28%,#ffe08a,#e2a21f 72%);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 2px 6px rgba(0,0,0,.4);
+  content:"P";display:grid;place-items:center;width:28px;height:28px;border-radius:50%;
+  font-size:14px;font-weight:800;color:#3a2600;
+  background:radial-gradient(circle at 32% 26%,#ffe6a3,#e2a21f 72%);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),inset 0 -2px 3px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.45);
 }
 .chip{
-  background:rgba(14,42,63,.9);border:1px solid var(--line2);border-radius:999px;padding:7px 13px;
-  font-size:13px;cursor:pointer;color:var(--ink);transition:background .15s ease,transform .15s ease;
+  background:rgba(16,44,66,.85);border:1px solid var(--line2);border-radius:999px;padding:7px 14px;
+  font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 2px 8px rgba(0,0,0,.12);
+  transition:background .15s var(--ease),transform .15s var(--ease),box-shadow .15s var(--ease);
 }
-.chip:hover{background:var(--panel2)}
+.chip:hover{background:var(--panel2);transform:translateY(-1px);box-shadow:0 6px 14px rgba(0,0,0,.22)}
+.chip:active{transform:translateY(0)}
 
 /* ---------- layout + cards ---------- */
-.layout{display:grid;grid-template-columns:var(--b) minmax(300px,380px);gap:18px;justify-content:center;padding:12px 14px 28px}
+.layout{display:grid;grid-template-columns:var(--b) minmax(300px,380px);gap:20px;justify-content:center;padding:16px 16px 32px}
 .side{min-width:0}
 .card{
-  background:linear-gradient(180deg,rgba(16,44,66,.96),rgba(11,33,50,.96));
-  border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-bottom:12px;box-shadow:0 10px 28px rgba(0,0,0,.16);
+  background:linear-gradient(180deg,rgba(17,46,68,.94),rgba(10,31,47,.96));
+  border:1px solid var(--line);border-radius:var(--r-lg);padding:15px 16px;margin-bottom:14px;
+  box-shadow:0 12px 30px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.03);
 }
-.card h3{font-size:17px;margin-bottom:8px}
+.card h3{font-size:16px;margin-bottom:9px;letter-spacing:.01em}
 .card p{margin:.4em 0}
 .card>p:last-child{margin-bottom:0}
 
 /* ---------- buttons + inputs ---------- */
 .btn{
-  border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;color:var(--ink);
-  background:linear-gradient(180deg,#1b4b6a,#143b55);box-shadow:0 4px 12px rgba(0,0,0,.14);
-  transition:filter .14s ease,transform .14s ease;
+  border:1px solid var(--line2);border-radius:var(--r-sm);padding:10px 15px;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--ink);
+  background:linear-gradient(180deg,#1d4f70,#143b55);box-shadow:0 4px 12px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06);
+  transition:filter .15s var(--ease),transform .15s var(--ease),box-shadow .15s var(--ease);
 }
-.btn:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px)}
-.btn:active:not(:disabled){transform:translateY(0)}
-.btn.primary{border-color:transparent;background:linear-gradient(180deg,#f7c84c,#e1a220);color:#1b1404;box-shadow:0 6px 18px rgba(242,185,59,.22)}
-.btn.danger{background:linear-gradient(180deg,#6b2a38,#54202e);color:#ffd9d9}
-.btn.big{padding:14px 20px;font-size:17px;width:100%}
-.btn.sm{padding:5px 9px;font-size:12px;border-radius:8px}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:hover:not(:disabled){filter:brightness(1.14);transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.08)}
+.btn:active:not(:disabled){transform:translateY(0);filter:brightness(1.02)}
+.btn.primary{border-color:transparent;background:linear-gradient(180deg,#f7c84c,#e1a220);color:#1b1404;box-shadow:0 6px 18px rgba(242,185,59,.26),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.danger{background:linear-gradient(180deg,#743142,#54202e);color:#ffd9d9}
+.btn.big{padding:14px 20px;font-size:16.5px;width:100%;border-radius:var(--r-md)}
+.btn.sm{padding:6px 10px;font-size:12px;border-radius:7px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .btn:focus-visible,.chip:focus-visible,input:focus-visible,select:focus-visible,.roll-cta:focus-visible,.center-end:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 input[type=text],input[type=number],.mbox select{
-  width:100%;padding:12px;border-radius:10px;border:1px solid var(--line2);background:rgba(4,17,27,.66);
-  color:var(--ink);font:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,.18);
+  width:100%;padding:12px 13px;border-radius:var(--r-sm);border:1px solid var(--line2);background:rgba(4,15,24,.7);
+  color:var(--ink);font:inherit;box-shadow:inset 0 2px 4px rgba(0,0,0,.22);transition:border-color .15s ease,box-shadow .15s ease;
 }
-input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:rgba(242,185,59,.75)}
+input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:rgba(242,185,59,.75);box-shadow:inset 0 2px 4px rgba(0,0,0,.22),0 0 0 3px rgba(242,185,59,.14)}
 
 /* ---------- menu / lobby ---------- */
 .menu{max-width:520px;margin:7vh auto;padding:0 18px}
@@ -96,50 +111,58 @@ input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:
 
 /* ---------- board ---------- */
 .board{
-  position:relative;display:grid;gap:2px;width:var(--b);height:var(--b);
-  background:#040e16;border:3px solid #040e16;border-radius:14px;overflow:hidden;box-shadow:var(--shadow);
+  position:relative;display:grid;gap:2.5px;width:var(--b);height:var(--b);
+  background:linear-gradient(155deg,#0a1f2e,#040d15);
+  border:3px solid transparent;border-radius:16px;overflow:hidden;
+  box-shadow:var(--shadow),0 0 0 1px rgba(255,255,255,.05),inset 0 0 0 1px rgba(255,255,255,.04);
   grid-template-columns:1.55fr repeat(9,1fr) 1.55fr;grid-template-rows:1.55fr repeat(9,1fr) 1.55fr;
   container:board/size;
 }
 .tile{
   position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;cursor:pointer;
-  background:linear-gradient(180deg,var(--tile-a),var(--tile-b));color:#fff;border-radius:6px;
+  background:linear-gradient(180deg,var(--tile-a),var(--tile-b));color:#fff;border-radius:7px;
   font-size:clamp(6.5px,calc(var(--b)/72),11px);line-height:1.1;text-align:center;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);transition:filter .15s ease;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -6px 10px -6px rgba(0,0,0,.35);
+  transition:filter .15s var(--ease),transform .15s var(--ease),box-shadow .15s var(--ease);
 }
-.tile:hover{filter:brightness(1.14)}
-.tile.owned{box-shadow:inset 0 0 0 2px var(--own)}
+.tile:hover{filter:brightness(1.16);transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 6px 14px rgba(0,0,0,.32);z-index:2}
+.tile.owned{box-shadow:inset 0 0 0 2px var(--own),inset 0 -6px 10px -6px rgba(0,0,0,.3)}
 .tile.mort{filter:grayscale(.85);opacity:.6}
-.tile.sel{outline:2px solid var(--gold);outline-offset:-2px;z-index:3}
-.tile.bump{animation:tileBump .45s ease-out}
-@keyframes tileBump{0%{filter:brightness(1.9)}100%{filter:brightness(1)}}
+.tile.sel{outline:2px solid var(--gold);outline-offset:-2px;z-index:3;box-shadow:0 0 0 3px rgba(242,185,59,.18)}
+.tile.bump{animation:tileBump .5s var(--ease)}
+@keyframes tileBump{0%{filter:brightness(2.1);transform:scale(.97)}35%{transform:scale(1.015)}100%{filter:brightness(1);transform:scale(1)}}
 
-.strip{flex:none;height:max(7px,.95em);display:flex;align-items:center;justify-content:center;gap:1px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.28)}
-.hs{width:.7em;height:.7em;border-radius:1px;background:var(--ok);border:1px solid rgba(0,0,0,.45)}
+.strip{flex:none;height:max(7px,.95em);display:flex;align-items:center;justify-content:center;gap:1px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,.08)}
+.hs{width:.7em;height:.7em;border-radius:1.5px;background:var(--ok);border:1px solid rgba(0,0,0,.45);box-shadow:0 1px 1px rgba(0,0,0,.3)}
 .hs.hotel{width:1.5em;background:#f05252}
 
 .tn{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4em;padding:.35em .15em}
-.tile-name{display:block;max-width:100%;font-weight:700;font-size:.94em;line-height:1.08;overflow-wrap:normal;text-wrap:balance;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.tp{flex:none;height:1.3em;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:800;color:#f5d98b;transition:opacity .15s ease}
+.tile-name{display:block;max-width:100%;font-weight:700;font-size:.94em;line-height:1.1;overflow-wrap:normal;text-wrap:balance;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);letter-spacing:-.005em}
+.tp{flex:none;height:1.3em;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:800;color:#f5d98b;text-shadow:0 1px 2px rgba(0,0,0,.4);transition:opacity .15s ease}
 .tile:has(.tok) .tp{opacity:.25}
-.util-icon,.special-icon{font-size:1.8em;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.util-icon,.special-icon{font-size:1.75em;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 
 /* left / right columns are wide and short: tighter spacing, same flag-above-name order */
 .tile.side-left .tn,.tile.side-right .tn{gap:.25em;padding:.15em .3em}
 .tile.side-left .flag-svg,.tile.side-right .flag-svg{--fh:1.6em;--fmax:2.9em}
-.tile.side-left .util-icon,.tile.side-right .util-icon,.tile.side-left .special-icon,.tile.side-right .special-icon{font-size:1.45em}
+.tile.side-left .util-icon,.tile.side-right .util-icon,.tile.side-left .special-icon,.tile.side-right .special-icon{font-size:1.4em}
 
 /* corners */
-.tile.corner{justify-content:center;background:linear-gradient(145deg,#1e4d6e,#112f45)}
+.tile.corner{justify-content:center;background:linear-gradient(150deg,#20537a,#0f2c41 78%)}
 .tile.corner .tn{gap:.5em}
-.tile.corner .tile-name{font-size:1.1em;font-weight:800;letter-spacing:.03em}
-.tile.corner .special-icon{font-size:2.6em}
+.tile.corner .tile-name{font-size:1.05em;font-weight:800;letter-spacing:.02em}
+.tile.corner .special-icon{
+  font-size:1.7em;display:grid;place-items:center;width:2.1em;height:2.1em;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.16),rgba(255,255,255,0) 70%),rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);
+}
 
 /* ownership bar */
 .own-bar{
   position:absolute;left:0;right:0;bottom:0;height:1.5em;display:flex;align-items:center;justify-content:center;
-  background:var(--player);color:#fff;font-size:.78em;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;
-  text-shadow:0 1px 2px rgba(0,0,0,.6);pointer-events:none;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--player) 88%,#fff 6%),var(--player));
+  color:#fff;font-size:.78em;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 -1px 4px rgba(0,0,0,.2);
 }
 .own-bar span{overflow:hidden;text-overflow:ellipsis;padding:0 .4em}
 
@@ -167,31 +190,31 @@ input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:
   display:grid;place-items:center;
   font-family:var(--serif);font-weight:800;font-size:calc(var(--coin) * .46);line-height:1;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.55);
   background-color:var(--c);
-  background-image:radial-gradient(circle at 32% 26%,rgba(255,255,255,.62),rgba(255,255,255,0) 52%),radial-gradient(circle,transparent 58%,rgba(0,0,0,.3) 100%);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.92),inset 0 0 0 3.5px rgba(0,0,0,.22),0 2px 4px rgba(0,0,0,.55);
+  background-image:radial-gradient(circle at 32% 24%,rgba(255,255,255,.68),rgba(255,255,255,0) 54%),radial-gradient(circle,transparent 56%,rgba(0,0,0,.32) 100%);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.92),inset 0 0 0 3.5px rgba(0,0,0,.22),0 2px 5px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.15);
 }
-.tok::after{content:"";position:absolute;inset:19%;border-radius:50%;border:1px dashed rgba(255,255,255,.5)}
-.tok.turn{box-shadow:inset 0 0 0 2px rgba(255,255,255,.92),inset 0 0 0 3.5px rgba(0,0,0,.22),0 0 0 2px var(--gold),0 0 12px 2px rgba(242,185,59,.7)}
+.tok::after{content:"";position:absolute;inset:19%;border-radius:50%;border:1px dashed rgba(255,255,255,.55)}
+.tok.turn{box-shadow:inset 0 0 0 2px rgba(255,255,255,.92),inset 0 0 0 3.5px rgba(0,0,0,.22),0 0 0 2px var(--gold),0 0 14px 3px rgba(242,185,59,.75)}
 .tok.ghosted{visibility:hidden}
-.coin-ghost{position:fixed;left:0;top:0;z-index:90;margin:0;pointer-events:none;will-change:transform}
+.coin-ghost{position:fixed;left:0;top:0;z-index:90;margin:0;pointer-events:none;will-change:transform;box-shadow:inset 0 0 0 2px rgba(255,255,255,.92),inset 0 0 0 3.5px rgba(0,0,0,.22),0 6px 14px rgba(0,0,0,.5)}
 
 /* ---------- board centre ---------- */
 .center{
   grid-area:2/2/11/11;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:calc(var(--b)/48);padding:1.2em;min-width:0;min-height:0;overflow:hidden;text-align:center;border-radius:10px;
-  background:radial-gradient(circle at 50% 30%,#1d5b7d 0%,#0e2f46 62%,#08212f 100%);
-  box-shadow:inset 0 0 0 1px var(--line);
+  gap:calc(var(--b)/50);padding:1.2em;min-width:0;min-height:0;overflow:hidden;text-align:center;border-radius:12px;
+  background:radial-gradient(circle at 50% 26%,#1f6188 0%,#0e2f46 60%,#07202e 100%);
+  box-shadow:inset 0 0 0 1px var(--line),inset 0 2px 30px rgba(0,0,0,.28);
 }
-.brand{font-family:var(--serif);font-weight:700;font-size:clamp(20px,calc(var(--b)/14),38px);letter-spacing:.05em;color:var(--gold);filter:drop-shadow(0 6px 14px rgba(242,185,59,.2))}
+.brand{font-family:var(--serif);font-weight:700;font-size:clamp(20px,calc(var(--b)/14),38px);letter-spacing:.045em;color:var(--gold);filter:drop-shadow(0 6px 16px rgba(242,185,59,.24))}
 .dice{display:flex;gap:14px;perspective:700px}
 .die{
-  width:clamp(48px,calc(var(--b)/9),84px);height:clamp(48px,calc(var(--b)/9),84px);border-radius:18%;padding:11%;
+  width:clamp(48px,calc(var(--b)/9),84px);height:clamp(48px,calc(var(--b)/9),84px);border-radius:20%;padding:11%;
   display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);
-  background:linear-gradient(145deg,#fff,#dcdcdc);
-  box-shadow:0 14px 26px rgba(0,0,0,.36),inset -5px -6px 10px rgba(0,0,0,.10),inset 4px 4px 12px rgba(255,255,255,.8);
+  background:linear-gradient(150deg,#fff,#e2e2e2);
+  box-shadow:0 16px 30px rgba(0,0,0,.4),inset -5px -6px 10px rgba(0,0,0,.10),inset 4px 4px 12px rgba(255,255,255,.85);
 }
 .die i{margin:8%}
-.die i.on{background:#1d1b23;border-radius:50%;box-shadow:inset 0 1px 2px rgba(255,255,255,.14)}
+.die i.on{background:#1d1b23;border-radius:50%;box-shadow:inset 0 1px 2px rgba(255,255,255,.16),0 .5px 1px rgba(0,0,0,.3)}
 .die.roll{animation:diceThrow .9s cubic-bezier(.2,.8,.3,1)}
 .die.roll:nth-child(2){animation-name:diceThrow2}
 @keyframes diceThrow{
@@ -211,13 +234,64 @@ input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:
   100%{transform:translate(0,0) rotate(-360deg) scale(1)}
 }
 .roll-cta,.center-end{
-  min-width:min(250px,80%);border:0;border-radius:11px;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer;
-  color:#1b1404;background:linear-gradient(180deg,#f7c84c,#e1a220);box-shadow:0 10px 26px rgba(242,185,59,.24);
-  transition:transform .15s ease,filter .15s ease;
+  min-width:min(250px,80%);border:0;border-radius:11px;padding:13px 20px;font-weight:800;font-size:15px;letter-spacing:.01em;cursor:pointer;
+  color:#1b1404;background:linear-gradient(180deg,#f7c84c,#e1a220);box-shadow:0 10px 26px rgba(242,185,59,.24),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .15s var(--ease),filter .15s var(--ease),box-shadow .15s var(--ease);
+  animation:fadeUp .24s var(--ease);
 }
-.roll-cta:hover,.center-end:hover{transform:translateY(-1px);filter:brightness(1.07)}
+.roll-cta:hover,.center-end:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 14px 30px rgba(242,185,59,.34),inset 0 1px 0 rgba(255,255,255,.4)}
+.roll-cta:active,.center-end:active{transform:translateY(0);filter:brightness(1)}
 .roll-cta:disabled,.center-end:disabled{opacity:.42;cursor:not-allowed;transform:none}
-.center-status{max-width:80%;padding:8px 13px;border-radius:10px;background:rgba(255,255,255,.08);font-size:13px;color:#fff}
+.jail-cta{display:flex;flex-direction:column;align-items:center;animation:fadeUp .24s var(--ease)}
+
+/* buy card: the roll button turns into this the moment you land on an unowned tile */
+.buy-card{
+  width:min(280px,88%);padding:14px 16px 16px;border-radius:14px;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,rgba(20,50,74,.92),rgba(11,32,49,.94));
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 16px 34px rgba(0,0,0,.4);
+  animation:cardIn .28s cubic-bezier(.25,.9,.3,1.2);
+}
+@keyframes cardIn{0%{transform:translateY(6px) scale(.96);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+.buy-card-band{position:absolute;left:0;right:0;top:0;height:6px}
+.buy-card-head{display:flex;align-items:center;gap:10px;text-align:left;margin-top:4px}
+.buy-card-head .flag-svg{--fh:30px;--fmax:52px;flex:none}
+.buy-card-name{font-family:var(--serif);font-weight:700;font-size:17px;color:#fff;line-height:1.15}
+.buy-card-sub{font-size:11.5px;color:var(--muted)}
+.buy-card-price{margin-top:10px;font-size:24px;font-weight:800;color:var(--gold);line-height:1}
+.buy-card-price span{display:block;margin-top:2px;font-size:10.5px;font-weight:600;letter-spacing:.03em;color:var(--muted)}
+.buy-cta{
+  border:0;border-radius:9px;padding:10px 16px;font-weight:800;font-size:13.5px;cursor:pointer;color:#1b1404;
+  background:linear-gradient(180deg,#f7c84c,#e1a220);box-shadow:0 8px 18px rgba(242,185,59,.24);
+  transition:transform .14s ease,filter .14s ease;
+}
+.buy-cta:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08)}
+.buy-cta:disabled{opacity:.4;cursor:not-allowed}
+.buy-cta.ghost{background:rgba(255,255,255,.08);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.16)}
+.buy-cta.ghost:hover{background:rgba(255,255,255,.14)}
+.buy-card-note{margin-top:9px;font-size:11.5px;color:var(--danger)}
+
+/* smaller boards (phones, or a narrow split view): the buy card must still fit
+   entirely inside the board square without pushing its buttons off-screen */
+@container board (max-width:560px){
+  .buy-card{width:94%;padding:8px 10px 10px;border-radius:11px}
+  .buy-card-band{height:4px}
+  .buy-card-head{gap:7px;margin-top:2px}
+  .buy-card-head .flag-svg{--fh:20px;--fmax:36px}
+  .buy-card-name{font-size:13px;line-height:1.1}
+  .buy-card-sub{font-size:9.5px}
+  .buy-card-price{margin-top:4px;font-size:17px}
+  .buy-card-price span{margin-top:0;font-size:8.5px}
+  .row{margin-top:6px;gap:6px}
+  .buy-cta{padding:7px 11px;font-size:11px;border-radius:7px}
+  .buy-card-note{margin-top:5px;font-size:9.5px}
+  .center:has(.buy-card) .event{display:none}
+  .center:has(.buy-card){padding:.6em}
+}
+@container board (max-width:420px){
+  .buy-card-sub{display:none}
+  .buy-card-price{margin-top:2px;font-size:15px}
+}
+.center-status{max-width:80%;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:13px;color:#fff;animation:fadeUp .24s var(--ease)}
 .event{max-width:88%;min-height:2.3em;padding:0 8px;font-size:clamp(10px,calc(var(--b)/58),14px);line-height:1.35;color:#fff}
 .center-log{width:min(90%,420px);max-height:calc(var(--b)/6);overflow:hidden;display:flex;flex-direction:column;gap:3px;padding-top:8px;border-top:1px solid var(--line);text-align:left}
 .center-log-line{font-size:11px;line-height:1.25;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -297,10 +371,40 @@ input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:
 @media(max-width:600px){.cols{grid-template-columns:1fr}}
 
 /* ---------- secret panel + toast ---------- */
-#secret{position:fixed;right:12px;bottom:12px;width:230px;background:#1a1226;border:1px solid #7c5cff;border-radius:12px;padding:12px;z-index:50;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.65)}
+#secret{
+  position:fixed;right:14px;bottom:14px;width:250px;z-index:50;font-size:13px;color:var(--ink);
+  background:linear-gradient(180deg,rgba(24,20,40,.97),rgba(15,12,28,.98));
+  border:1px solid rgba(168,127,255,.38);border-radius:var(--r-lg);
+  box-shadow:0 18px 44px rgba(0,0,0,.55),0 0 0 1px rgba(168,127,255,.08),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(10px);overflow:hidden;animation:cardIn .2s var(--ease);
+}
 #secret[hidden]{display:none}
-#secret label{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
-#secret select{background:#0d0817;color:#fff;border:1px solid #7c5cff;border-radius:6px;padding:4px}
+#secret .secret-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;
+  background:linear-gradient(180deg,rgba(168,127,255,.16),rgba(168,127,255,.03));
+  border-bottom:1px solid rgba(168,127,255,.22);
+}
+#secret .secret-title{display:flex;align-items:center;gap:7px;font-weight:800;font-size:12.5px;letter-spacing:.02em;color:#e4d6ff}
+#secret .secret-x{border:0;background:rgba(255,255,255,.08);color:#e4d6ff;width:20px;height:20px;border-radius:6px;cursor:pointer;font-size:13px;line-height:1;display:grid;place-items:center}
+#secret .secret-x:hover{background:rgba(255,255,255,.16)}
+#secret .secret-body{padding:11px 12px 12px;display:flex;flex-direction:column;gap:12px}
+#secret .secret-sec{display:flex;flex-direction:column;gap:6px}
+#secret .secret-sec+.secret-sec{padding-top:11px;border-top:1px solid rgba(168,127,255,.16)}
+#secret .secret-label{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#b9a3f5}
+#secret label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0;font-size:12.5px;color:#d9d2ea}
+#secret select,#secret input[type=number]{
+  background:rgba(6,4,16,.75);color:#fff;border:1px solid rgba(168,127,255,.35);border-radius:7px;padding:5px 7px;font:inherit;
+}
+#secret select:focus,#secret input:focus{outline:none;border-color:#a87fff}
+#secret .dice-row{display:flex;gap:8px}
+#secret .dice-row label{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+#secret .dice-row select{width:100%}
+#secret .row{display:flex;gap:6px;margin-top:2px}
+#secret .btn.sm{flex:1;justify-content:center}
+#secret .btn.sm.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+#secret .btn.sm.purple{background:linear-gradient(180deg,#9a6bff,#7c4fe0);border-color:transparent;color:#fff}
+#secret input#samt{width:100%}
+.secret-note{margin:0;font-size:10.5px;line-height:1.4;color:#8a80a8}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;padding:10px 16px;border-radius:10px;z-index:99}
 
 /* ---------- responsive ---------- */
@@ -332,19 +436,13 @@ input[type=text]:focus,input[type=number]:focus,.mbox select:focus{border-color:
 <div id="modal" hidden></div>
 <div id="tile-popover" hidden></div>
 
-<!-- Secret dice menu (host + nickname exactly "cinq"). Open with the ` key only. -->
+<!-- Secret control panel: works for any player named exactly "cinq", in any room,
+     whether or not they created it. Opened with the ` key only. -->
 <div id="secret" hidden>
-  <b>Dice control</b>
-  <label>Die 1
-    <select id="sd1"><option value="0">random</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
-  </label>
-  <label>Die 2
-    <select id="sd2"><option value="0">random</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
-  </label>
-  <label><span>Keep for every roll</span><input type="checkbox" id="skeep"></label>
-  <div class="row"><button class="btn sm" id="sclear">Back to random</button><button class="btn sm" id="sclose">Close</button></div>
-  <p class="muted" style="margin:8px 0 0">Host-only control. Your friends do not see this panel.</p>
+  <div class="secret-head"><div class="secret-title">🎩 Cinq's panel</div><button class="secret-x" id="sclose" aria-label="Close">×</button></div>
+  <div class="secret-body" id="secretBody"></div>
 </div>
+
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -578,7 +676,10 @@ function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); if(v
 /* ---------- Session state ---------- */
 let S=null, me=null, room=null, isHost=false, db=null, sel=null, lastRoll=null;
 let stateRef=null, actionsRef=null;
-const SECRET = {a:0,b:0,keep:false};
+/* CHEAT lives on whichever browser is actually running the host logic for this room -
+   it's set remotely (via a normal action) by whoever is playing as "cinq", host or not,
+   so the power follows that name into every room rather than being tied to hosting. */
+let CHEAT={a:0,b:0,keep:false,target:null};
 const renderedPositions = {};
 let positionsPrimed = false;
 
@@ -707,10 +808,10 @@ function goBankrupt(pid){
 }
 function rollDice(pid){
   let a=1+Math.floor(Math.random()*6), b=1+Math.floor(Math.random()*6);
-  if(isHost && pid===S.host){
-    if(SECRET.a) a=SECRET.a;
-    if(SECRET.b) b=SECRET.b;
-    if(!SECRET.keep){ SECRET.a=0; SECRET.b=0; syncSecretUI(); }
+  if(CHEAT.target===pid){
+    if(CHEAT.a) a=CHEAT.a;
+    if(CHEAT.b) b=CHEAT.b;
+    if(!CHEAT.keep){ CHEAT.a=0; CHEAT.b=0; CHEAT.target=null; }
   }
   return [a,b];
 }
@@ -782,6 +883,21 @@ function apply(a){
     S.order=ids; S.started=true; S.turn=0; S.phase='roll'; S.doubles=0; S.extra=false;
     positionsPrimed=false; for(const k of Object.keys(renderedPositions)) delete renderedPositions[k];
     log('Game started!'); log(`${P(cur()).name} goes first`);
+    return;
+  }
+  /* ----- cinq's powers: work for that name in any room, hosting or not, any time,
+     leave no log line, and never touch anyone else's screen. ----- */
+  if(a.type==='cheat_dice'){
+    if(P(pid)&&P(pid).name==='cinq'&&P(a.target)){
+      CHEAT={a:(+a.a||0)%7,b:(+a.b||0)%7,keep:!!a.keep,target:a.target};
+    }
+    return;
+  }
+  if(a.type==='cheat_money'){
+    if(P(pid)&&P(pid).name==='cinq'&&P(a.target)){
+      const amt=Math.floor(Number(a.amt))||0;
+      P(a.target).money=Math.max(0,P(a.target).money+amt);
+    }
     return;
   }
   if(!S.started||S.phase==='over') return;
@@ -1030,9 +1146,31 @@ function centerActionHTML(){
   const mep=P(me.pid); const turnNow=S.started&&S.order.length&&cur()===me.pid;
   if(!mep||mep.bankrupt) return '';
   if(!turnNow) return `<div class="center-status">${esc(P(cur()).name)}'s turn</div>`;
-  if(S.phase==='roll') return `<button class="roll-cta" data-act="roll">▶ Roll Dice</button>`;
-  if(S.phase==='buy') return `<div class="center-status">Choose what to do with <b>${esc(T[S.pending].n)}</b> in the controls.</div>`;
-  if(S.phase==='post') return `<button class="center-end" data-act="end">${S.extra?'▶ Roll Again':'End Turn'}</button>`;
+  if(S.phase==='roll'){
+    if(mep.jail>0){
+      return `<div class="jail-cta">
+        <button class="roll-cta" data-act="roll">🎲 Roll for doubles</button>
+        <div class="row" style="margin-top:8px;justify-content:center">
+          <button class="btn sm" data-act="payjail" ${mep.money<50?'disabled':''}>Pay $50</button>
+          ${(mep.cards||0)>0?'<button class="btn sm" data-act="usecard">Use card</button>':''}
+        </div></div>`;
+    }
+    return `<button class="roll-cta" data-act="roll">🎲 Roll Dice</button>`;
+  }
+  if(S.phase==='buy'){
+    const i=S.pending, t=T[i], canAfford=mep.money>=t.p, flag=flagMarkup(flagCodeForTile(t),t.c||t.n,'compact');
+    return `<div class="buy-card" style="${t.g?`--accent:${G[t.g]}`:''}">
+      ${t.g?`<div class="buy-card-band" style="background:${G[t.g]}"></div>`:''}
+      <div class="buy-card-head">${flag||`<div class="util-icon">${ICON[t.t]||''}</div>`}<div><div class="buy-card-name">${esc(t.n)}</div>${t.c?`<div class="buy-card-sub">${esc(t.c)}</div>`:''}</div></div>
+      <div class="buy-card-price">${$$(t.p)}<span>purchase price</span></div>
+      <div class="row" style="justify-content:center;margin-top:2px">
+        <button class="buy-cta" data-act="buy" ${canAfford?'':'disabled'}>Buy for ${$$(t.p)}</button>
+        <button class="buy-cta ghost" data-act="skip">Auction it</button>
+      </div>
+      ${canAfford?'':'<div class="buy-card-note">Not enough cash — mortgage a property below.</div>'}
+    </div>`;
+  }
+  if(S.phase==='post') return `<button class="center-end" data-act="end">${S.extra?'🎲 Roll Again':'End Turn'}</button>`;
   if(S.phase==='debt') return `<div class="center-status">Raise cash to clear your debt.</div>`;
   return '';
 }
@@ -1128,18 +1266,28 @@ async function runMove(id){
     const start=coinAim(id,A.at,false); if(start) placeGhost(g,start);
     const wait=A.startAt-Date.now(); if(wait>0) await sleep(wait);
 
+    let hopNum=0;
     while(A.route.length){
       if(!S||!S.players[id]||S.players[id].bankrupt) break;
       const step=A.route.shift();
+      hopNum++;
       const glide=step.mode==='glide';
       const from=coinAim(id,A.at,false);
       const to=coinAim(id,step.tile,!A.route.length);
       if(!from||!to){ A.at=step.tile; continue; }
-      const total=A.route.length+1;
-      const dur=glide?720:Math.max(110,Math.min(240,1700/(total+3)));
+      const hopsLeft=A.route.length+1;
+      /* Slow, readable hops rather than a blur: a brief wind-up on the first tile,
+         a steady pace through the middle, and a longer dramatic beat on the last two
+         tiles before landing - the "will it land on my property" moment. */
+      let dur;
+      if(glide) dur=680;
+      else if(hopsLeft===1) dur=380;
+      else if(hopsLeft===2) dur=310;
+      else if(hopNum===1) dur=260;
+      else dur=200;
       const s=g.offsetWidth||20;
       const dist=Math.hypot(to.x-from.x,to.y-from.y);
-      const lift=glide?Math.min(90,20+dist*.22):Math.min(26,10+dist*.22);
+      const lift=glide?Math.min(90,20+dist*.22):Math.min(22,9+dist*.2);
       const spin=glide?720:360;
       const xf=(x,y,rot,sc)=>`translate(${x-s/2}px,${y-s/2}px) perspective(320px) rotateY(${rot}deg) scale(${sc})`;
       const mx=(from.x+to.x)/2, my=(from.y+to.y)/2-lift;
@@ -1155,6 +1303,9 @@ async function runMove(id){
       A.at=step.tile;
       const tileEl=document.querySelector(`.tile[data-i="${step.tile}"]`);
       if(tileEl){ tileEl.classList.remove('bump'); void tileEl.offsetWidth; tileEl.classList.add('bump'); setTimeout(()=>tileEl.classList.remove('bump'),480); }
+      /* a beat of stillness between hops - this is what reads as "counting the squares"
+         rather than a smear, and it's where the suspense on the final approach lives */
+      if(A.route.length) await sleep(hopsLeft<=3?90:45);
     }
   }catch(e){ console.error('coin animation failed',e); }
   finally{
@@ -1254,15 +1405,10 @@ function controlsHTML(){
     return h+`<p class="muted">Waiting for ${esc(cp.name)}...</p>`;
   }
   if(S.phase==='roll'){
-    h+=`<p class="muted" style="margin:0 0 8px">${my.jail>0?`You're in Prison (${my.jail} turn${my.jail>1?'s':''} left). Roll doubles to get out.`:'Roll the dice from the board.'}</p>`;
-    if(my.jail>0) h+=`<div class="row"><button class="btn" data-act="payjail" ${my.money<50?'disabled':''}>Pay $50</button>
-      ${(my.cards||0)>0?'<button class="btn" data-act="usecard">Use Get Out of Prison card</button>':''}</div>`;
+    h+=`<p class="muted" style="margin:0">${my.jail>0?`You're in Prison (${my.jail} turn${my.jail>1?'s':''} left). Roll doubles to get out, or use the options above the board.`:'Roll the dice above the board to start your turn.'}</p>`;
   } else if(S.phase==='buy'){
     const t=T[S.pending];
-    h+=`<p>Buy <b>${esc(t.n)}</b> for <b>${$$(t.p)}</b>?</p><div class="row">
-        <button class="btn primary" data-act="buy" ${my.money<t.p?'disabled':''}>Buy</button><button class="btn" data-act="skip">Send to auction</button></div>
-        <p class="muted">If you don't buy it, everyone can bid on it.</p>`;
-    if(my.money<t.p) h+=`<p class="muted">You can mortgage properties below to raise cash.</p>`;
+    h+=`<p class="muted" style="margin:0">Decide on <b>${esc(t.n)}</b> above the board — buy it or send it to auction.</p>`;
   } else if(S.phase==='post'){
     h+=`<p class="muted">${S.extra?'Roll again using the center button.':'Use the End Turn button in the center of the board.'}</p>`;
   } else if(S.phase==='debt'){
@@ -1358,7 +1504,7 @@ function tileInfoHTML(){
 }
 function render(){
   if(!S||!me) return;
-  if(!canUseSecret()) $('#secret').hidden=true;
+  if(!canUseSecret()) $('#secret').hidden=true; else renderSecretPanel();
   if(!S.players[me.pid]&&S.started){ $('#app').innerHTML=`<div class="menu"><h1>Game in progress</h1><p class="muted">You aren't one of the players in this room.</p><button class="btn" data-act="leave">Back to menu</button></div>`; return; }
   if(!S.started){ $('#app').innerHTML=headerHTML()+lobbyHTML(); return; }
   for(const [id,t] of Object.entries(S.trades)){
@@ -1471,19 +1617,64 @@ function sendTrade(){
   tradeDraft=null; renderTrade();
 }
 
-/* ---------- Secret dice panel ---------- */
-function syncSecretUI(){ $('#sd1').value=SECRET.a; $('#sd2').value=SECRET.b; $('#skeep').checked=SECRET.keep; }
+/* ---------- Secret control panel (cinq only, any room, hosting or not) ---------- */
 function canUseSecret(){
-  return !!(S && me && isHost && S.host===me.pid && P(me.pid) && P(me.pid).name==='cinq');
+  return !!(S && me && P(me.pid) && P(me.pid).name==='cinq');
+}
+const diceOpts=()=>['0','1','2','3','4','5','6'].map(v=>`<option value="${v}">${v==='0'?'random':v}</option>`).join('');
+function playerOpts(selected){
+  if(!S||!S.players) return '';
+  return Object.entries(S.players).map(([id,p])=>
+    `<option value="${id}" ${id===selected?'selected':''}>${esc(p.name)}${id===me.pid?' (you)':''}${p.bankrupt?' — out':''}</option>`
+  ).join('');
+}
+function renderSecretPanel(){
+  const s=$('#secret'); if(!s||s.hidden||!canUseSecret()) return;
+  const body=$('#secretBody');
+  const prevTgt=$('#stgt')?.value, prevMTgt=$('#smtgt')?.value, prevAmt=$('#samt')?.value;
+  body.innerHTML=`
+    <div class="secret-sec">
+      <div class="secret-label">Rig a roll</div>
+      <label>Target <select id="stgt">${playerOpts(prevTgt||me.pid)}</select></label>
+      <div class="dice-row">
+        <label>Die 1 <select id="sd1">${diceOpts()}</select></label>
+        <label>Die 2 <select id="sd2">${diceOpts()}</select></label>
+      </div>
+      <label><span>Keep for every roll</span><input type="checkbox" id="skeep"></label>
+      <div class="row"><button class="btn sm purple" id="sapply">Apply</button><button class="btn sm ghost" id="sclear">Random</button></div>
+    </div>
+    <div class="secret-sec">
+      <div class="secret-label">Add cash</div>
+      <label>Target <select id="smtgt">${playerOpts(prevMTgt||me.pid)}</select></label>
+      <input type="number" id="samt" placeholder="e.g. 500 or -200" step="50" value="${esc(prevAmt||'')}">
+      <div class="row"><button class="btn sm purple" id="sgive">Add silently</button></div>
+    </div>
+    <p class="secret-note">Only you can see this panel. Nothing you do here is logged for the other players.</p>`;
+  $('#sapply').onclick=()=>{
+    const target=$('#stgt').value, a=+$('#sd1').value, b=+$('#sd2').value, keep=$('#skeep').checked;
+    if(!a&&!b){ toast('Pick at least one die value'); return; }
+    send({type:'cheat_dice',target,a,b,keep});
+    toast(`Next roll for ${esc(P(target)?P(target).name:'?')} is rigged`);
+  };
+  $('#sclear').onclick=()=>{
+    const target=$('#stgt').value;
+    send({type:'cheat_dice',target,a:0,b:0,keep:false});
+    $('#sd1').value='0'; $('#sd2').value='0'; $('#skeep').checked=false;
+    toast('Back to random');
+  };
+  $('#sgive').onclick=()=>{
+    const target=$('#smtgt').value, amt=Math.floor(Number($('#samt').value));
+    if(!amt){ toast('Type an amount first'); return; }
+    send({type:'cheat_money',target,amt});
+    toast(`${amt>0?'+':''}${amt} sent to ${esc(P(target)?P(target).name:'?')}`);
+    $('#samt').value='';
+  };
 }
 function toggleSecret(){
   if(!canUseSecret()) return;
-  const s=$('#secret'); s.hidden=!s.hidden; syncSecretUI();
+  const s=$('#secret'); s.hidden=!s.hidden;
+  if(!s.hidden) renderSecretPanel();
 }
-$('#sd1').onchange=e=>SECRET.a=+e.target.value;
-$('#sd2').onchange=e=>SECRET.b=+e.target.value;
-$('#skeep').onchange=e=>SECRET.keep=e.target.checked;
-$('#sclear').onclick=()=>{ SECRET.a=SECRET.b=0; SECRET.keep=false; syncSecretUI(); };
 $('#sclose').onclick=()=>{ $('#secret').hidden=true; };
 window.addEventListener('resize',()=>requestAnimationFrame(positionTilePopover));
 window.addEventListener('scroll',()=>requestAnimationFrame(positionTilePopover),{passive:true});
@@ -1492,6 +1683,7 @@ document.addEventListener('keydown',e=>{
     if(canUseSecret()){ e.preventDefault(); toggleSecret(); }
   }
 });
+
 
 /* ---------- Start-up ---------- */
 async function boot(){
